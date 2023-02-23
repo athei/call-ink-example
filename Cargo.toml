@@ -1,0 +1,7 @@
+[package]
+name = "call-ink"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+scale = { package = "parity-scale-codec", version = "3.4.0" }
