@@ -63,9 +63,9 @@ pub mod transfer {
 
     type Output = Result<(), ()>;
 
-    /// The `amount` is encoded and passed to the contract. As oposed to native_valie
-    /// Mixing in pallet-contracts arguments might be confusing. A builder pattern might
-    /// solve this issue. But if it is only about the value I would say that having
+    /// The `amount` is encoded and passed to the contract. As oposed to native_value.
+    /// Mixing in pallet-contracts arguments might be confusing. A builder pattern
+    /// solves this issue. But if it is only about the value I would say that having
     /// this concise API is worth more than the additional clarity from the builder.
     pub fn call(
         from: &AccountId,
@@ -108,7 +108,9 @@ pub mod with_trigger_value {
 // Hence it should probably be defined somewhere in ink! and re-exported by the contract
 // we are trying to depend upon.
 
+/// This is the type that pallet-contracts expect as input to call or instantiate.
 pub trait Call<T> {
+    /// The type that can decode the result a contract execution.
     type Decoder: OutputDecoder<T>;
 
     /// Not part of the input. Is passed to pallet-contracts.
@@ -118,7 +120,9 @@ pub trait Call<T> {
     fn into_input_data(self) -> Vec<u8>;
 }
 
+/// We split into two traits so that we can use the decoding separately.
 pub trait OutputDecoder<T> {
+    /// Verbatim what comes out of the contract.
     type Output: Decode + DecodeLimit;
 
     /// Decode whatever is returned from the contract.
@@ -137,10 +141,10 @@ pub trait OutputDecoder<T> {
     fn decode_output_unsafe_unbounded(output_data: &[u8]) -> Result<Self::Output, DecodeError>;
 }
 
-/// Marker trait: The call is a message.
+/// Marker trait: The call is a message. Prevents from passing constructors into `call`.
 pub trait IsMessage {}
 
-/// Marker trait: The call is a constructor.
+/// Marker trait: The call is a constructor. Prevents passing messages into `instantiate`.
 pub trait IsConstructor {}
 
 struct PayableCall {
